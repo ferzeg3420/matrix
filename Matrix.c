@@ -6,170 +6,193 @@
 // defined for square matrices. The particular implementation is for sparse
 // matrices using arrays of lists.
 
+#define "Heap.h"
 
-// Fields
+// Entry struct -------------------------------------------------------------------
+
+typedef struct EntryObj
+{
 double data; // changed for object.
 int columnNumber; 
+} EntryObj;
       
-// Constructor
-Entry(int columnNumber, double data) // changed int to object.
+// Constructors and destructors ---------------------------------------------------
+Entry newEntry(int columnNumber, double data)
 {
-   this.data = data;
-   this.columnNumber = columnNumber;
+   Entry E;
+   E = malloc(sizeof(EntryObj));
+   E->data = data;
+   E->columnNumber = columnNumber;
+   return E;
 }
 
-Entry(Entry other) // changed int to object.
+Entry Entry(Entry other) // changed int to object.
 {
-   this.data = other.data;
-   this.columnNumber = other.columnNumber;
+   Entry E = malloc(sizeof(EntryObj));
+   E->data = other->data;
+   E->columnNumber = other->columnNumber;
+   return E;
 }
 
-int getColumn()
+int getColumn(Entry E)
 {
-   return columnNumber;
+   return E->columnNumber;
 }
 
-void setData(double x)
+double getData(Entry E)
 {
-   data = x;
+   return E->data;
 }
 
-double getData()
+void setData(Entry E, double x)
 {
-   return data;
+   E->data = x;
 }
  
-string toString()
+FILE* toString(FILE *file)
 {
-   String toReturn = "(" + columnNumber + ", " + data + ")";
-   return toReturn;
+   scanf(file, "(%d, %d)", columnNumber);
+   return file;
 }
       
 // equals(): overrides Object's equals() method
-boolean equals(Object x) 
+/* int equals(Object x) */
+/* { */
+/*    int eq = 0; */
+/*    Entry that; */
+
+/*    if(x instanceof Entry) */
+/*    { */
+/*        that = (Entry) x; */
+/*        eq =( (this.columnNumber == that.columnNumber) */
+/*        && (this.data == that.data) ); */
+/*    } */
+/*    return eq; */
+/* } */
+
+// End of Entry -------------------------------------------------------------------
+
+// Matrix Definitions -------------------------------------------------------------
+
+// Struct -------------------------------------------------------------------------
+
+typedef struct MatrixObj
 {
-   boolean eq = false;
-   Entry that;
+int dimensions;
+List[] rows;
+} MatrixObj;
 
-   if(x instanceof Entry)
-   {
-       that = (Entry) x;
-       eq =( (this.columnNumber == that.columnNumber)
-       && (this.data == that.data) );
-   }
-   return eq;
-}
+// Contructors --------------------------------------------------------------------
 
-
-    
-// Fields
-private int dimensions;
-private List[] rows;
-
-// Constructor. Precondition n >= 1.
-Matrix(int n)
+// Matrix()
+// Precondition n >= 1. 
+Matrix newMatrix(int n)
 {
    if( n < 1 ) 
    {
-      throw new RuntimeException("Error: Program: Sparse, module: Matrix," 
-        " precondition: Matrix() constructor"
-       + " called with a bad dimension.");
+      printf("Error: Program: Sparse, module: Matrix,  precondition: Matrix()"
+             "constructor called with a bad dimension.");
+      exit(1);
    }
-   dimensions = n; 
-   rows = new List[dimensions + 1]; // + 1 because I am ignoring index 0
-   for( int i = 0; i <= dimensions; i++) // <= because I am ignoring index 0
+   Matrix M;
+   M = malloc(sizeof(MatrixObj));
+   M->dimensions = n;
+   M->rows = (List *)malloc( (n + 1) * sizeof(List) );
+
+   for( int i = 0; i <= M->dimensions; i++) // <= because I am ignoring index 0
    {
-      rows[i] = new List();
+      M->rows[i] = newList();
    }
 }
 
 
-// Access Functions --------------------------------------------------------
+// Access Functions ---------------------------------------------------------------
 
    // Returns the dimensions of the matrix.
-int getSize()
+int getSize(Matrix M)
 { 
-   return dimensions; 
+   return M->dimensions; 
 }
     
    // Returns the number of nonzero entries of the matrix.
-int getNNZ()
+int getNNZ(Matrix M)
 {
    int counter = 0;
    for( int i = 1; i <= dimensions; i++ )
    {
-      counter += rows[i].length();
+      counter += length(M->rows[i]);
    }
    return counter;
 }
 
 // Returns true if two matrices are equal. False otherwise.
-public boolean equals(Object x)
+boolean equals(Matrix L, Matrix R)
 {
-if( !(x instanceof Matrix) ) return false;
-Matrix other = (Matrix) x;
-List left = new List();
-List right = new List();
+   List left = newList();
+   List right = newList();
 
-if( this == other ) return true;
-
-if( getSize() != other.getSize() )
-{
-return false;
-}
-
-for( int i = 1; i <= dimensions; i++ )
-{
-   left = rows[i];
-   right = other.rows[i];
-
-    if( left.length() != right.length())
-       return false;
-	 
-   left.moveFront();
-   right.moveFront();
-
-   while( left.index() != -1 )
+   if(  L ==  R )
    {
-      if( !(left.get()).equals(right.get()) )
-         return false;
-      left.moveNext();
-      right.moveNext();
+      return true;
    }
+   if( getSize(L) != getSize(R) )
+   {
+      return false;
+   }
+   for( int i = 1; i <= L->dimensions; i++ )
+   {
+      left = L->rows[i];
+      right = R->rows[i];
+
+      if( length(left) != length(right))
+      {
+          return false;
+      }
+      moveFront(left);
+      moveFront(right);
+
+      while( index(left) != -1 )
+      {
+         if( !( equals(get(left), get(right)) ) )
+         {
+            return false;
+         }
+         moveNext(left);
+         moveNext(right);
+      }
    return true;
 }
 
     
 // Manipulation procedures -------------------------------------------------
 
-   // sets this Matrix to the zero state
-void makeZero()
+// sets this Matrix to the zero state
+void makeZero(Matrix M)
 {
-   for( int i = 1; i <= dimensions; i++ ) 
+   for( int i = 1; i <= M->dimensions; i++ ) 
    {
-      // if( rows[i].length() != 0 )
-      rows[i].clear();
+      clear(M->rows[i]);
    }
 }
 
    // returns a new Matrix having the same entries as this Matrix 
-Matrix copy()
+Matrix copy(Matrix L, Matrix R)
 {
-   Matrix matrixCopy = new Matrix(dimensions);
-   List thisRow = new List();
+   Matrix Copy = newMatrix(L->dimensions);
+   List thisRow = newList();
  
    int thisColumn;
    double thisData;
-      
-   for( int i = 1; i <= dimensions; i++ )
+
+   for( int i = 1; i <= M->dimensions; i++ )
    {
-      thisRow = rows[i];
+      thisRow = L->rows[i];
   
-      for( thisRow.moveFront(); thisRow.index() != -1; thisRow.moveNext() )
+      for( moveFront(thisRow); index(thisRow)!= -1; moveNext(thisRow) )
       {
-         thisColumn = ((Entry) thisRow.get()).getColumn();
-         thisData = ((Entry) thisRow.get()).getData();
-         matrixCopy.changeEntry(i, thisColumn, thisData);
+         thisColumn = getColumn(get(thisRow));
+         thisData = getData(get(thisRow));
+         changeEntry(copy, i, thisColumn, thisData);
       }
    }
    return matrixCopy;
@@ -178,49 +201,50 @@ Matrix copy()
 // changeEntry()
 // pre: 1<=i<=getSize(), 1<=j<=getSize()
 // changes ith row, jth column of this Matrix to x
-void changeEntry(int i, int j, double x)
+void changeEntry(Matrix M, int i, int j, double x)
 {
-   if( i < 1 || i > getSize() || j < 1 || j > getSize() )
+   if( i < 1 || i > getSize(M) || j < 1 || j > getSize(M) )
    {
-      throw new RuntimeException("Error: Program: Sparse, module: Matrix," 
-                                  + " precondition: changeEntry() called"
-                                  + " with out of bounds arguments.");
+      printf( "Error: Program: Sparse, module: Matrix, precondition:"
+              " changeEntry() called with out of bounds arguments.");
+      exit(1);
    }
-   Entry newEntry = new Entry(j, x);
+   Entry E = newEntry(j, x);
    if( rows[i].length() != 0 )
    {
-      for( rows[i].moveFront(); rows[i].index()>=0; rows[i].moveNext() )
+      for( moveFront(M->rows[i]); index(M->rows[i]) >= 0; moveNext(M->rows[i]) )
       {
-         if( ((Entry) rows[i].get()).getColumn() == j )
+         if( getColumn(get(M->rows[i])) == j )
          {
             if( x == 0 )
             {
-               rows[i].delete();
+               delete(M->rows[i]);
             }
             else
             {
-               ((Entry) rows[i].get()).setData(x);
+               setData(get(M->rows[i])), x);
             }
             break;
          }
-         if( ((Entry) rows[i].get()).getColumn() > j )
+      if(  getColumn( get(M->rows[i]) ) > j )
          {
             if( x != 0 )
             {
-               rows[i].insertBefore(newEntry);
+               insertBefore(M->rows[i],E);
             }
             break;
          }
       }
    }
-   if( rows[i].index() == -1 && x != 0 )
+   if( index(M->rows[i]) == -1 && x != 0 )
    {
-      rows[i].append(newEntry);
+      append(M->rows[i], E);
    }
 }
-    
+
+// Sort of done translating until here. Pick up from here.
 // returns a new Matrix that is the scalar product of this Matrix with x
-Matrix scalarMult(double x)
+Matrix scalarMult(Matrix M, double x)
 {
    Matrix resultMatrix = new Matrix(dimensions);
    
