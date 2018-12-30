@@ -246,26 +246,26 @@ void changeEntry(Matrix M, int i, int j, double x)
 // returns a new Matrix that is the scalar product of this Matrix with x
 Matrix scalarMult(Matrix M, double x)
 {
-   Matrix resultMatrix = new Matrix(dimensions);
+   Matrix resultMatrix = newMatrix(M->dimensions);
    
-   List oldRow = new List();
-   List resultRow = new List();
+   List oldRow = newList();
+   List resultRow = newList();
 
    if (x != 0)
    {
-      for( int i = 1; i <= dimensions; i++ )
+      for( int i = 1; i <= M->dimensions; i++ )
       {
-         oldRow = rows[i];
-         resultRow = resultMatrix.rows[i];
+         oldRow = M->rows[i];
+         resultRow = resultMatrix->rows[i];
 
-         for( oldRow.moveFront(); oldRow.index() != -1; oldRow.moveNext() )
+         for( moveFront(oldRow); index(oldRow)!= -1; moveNext(oldRow) )
          {
-            Entry resultEntry = new Entry
+            Entry resultEntry = newEntry
                (
-                  ((Entry) oldRow.get()).getColumn(),
-                  ((Entry) oldRow.get()).getData() * x
+		getColumn( get(oldRow) ),
+                getData( get(oldRow) ) * x
                );
-            resultRow.append(resultEntry);
+            append(resultRow, resultEntry);
          }
       }
    }
@@ -274,23 +274,23 @@ Matrix scalarMult(Matrix M, double x)
 
 // returns a new Matrix that is the sum of this Matrix with M
 // pre: getSize()==M.getSize()
-Matrix add(Matrix M)
+Matrix add(Matrix L, Matrix R)
 {
-   if( getSize() != M.getSize() )
+   if( getSize(L) != getSize(R) )
    {
-      throw new RuntimeException("Error: Program: Sparse, module: Matrix," 
-                                  + " precondition: add() called with"
-                                  + " mismatching dimensions.");
+      printf("Error: Program: Sparse, module: Matrix, precondition:"
+             " add() called with mismatching dimensions.");
+      exit(1);
    }
-   Matrix resultMatrix = new Matrix(dimensions);
-   List thisRow = new List();
-   List MRow = new List();
+   Matrix resultMatrix = newMatrix(L->dimensions);
+   List leftRow = newList();
+   List rightRow = newList();
 
    for( int i = 1; i <= getSize(); i++)
    {
-      thisRow = rows[i];
-      MRow = M.rows[i];
-      resultMatrix.rows[i] = addHelper(thisRow, MRow, true);
+      leftRow = L->rows[i];
+      rightRow = R->rows[i];
+      resultMatrix->rows[i] = addHelper(leftRow, rightRow, 0);
    }
    return resultMatrix;
 }
@@ -298,48 +298,48 @@ Matrix add(Matrix M)
 // sub()
 // returns a new Matrix that is the difference of this Matrix with M
 // pre: getSize()==M.getSize()
-Matrix sub(Matrix M)
+Matrix sub(Matrix L, Matrix R)
 {
-   if( getSize() != M.getSize() )
+   if( getSize(L) != getSize(R) )
    {
-      throw new RuntimeException("Error: Program: Sparse, module: Matrix," 
-                                  + " precondition: sub() called with"
-                                  + " mismatching dimensions.");
+      printf("Error: Program: Sparse, module: Matrix, precondition:"
+             " sub() called with mismatching dimensions.");
+      exit(1);
    }
-   Matrix resultMatrix = new Matrix(dimensions);
-   List thisRow = new List();
-   List MRow = new List();
+   Matrix resultMatrix = newMatrix(L->dimensions);
+   List leftRow = newList();
+   List rightRow = newList();
 
-   for( int i = 1; i <= getSize(); i++)
+   for( int i = 1; i <= getSize(L); i++)
    {
-      thisRow = rows[i];
-      MRow = M.rows[i];
-      resultMatrix.rows[i] = addHelper(thisRow, MRow, false);
+      leftRow = L->rows[i];
+      rightRow = R->rows[i];
+      resultMatrix->rows[i] = addHelper(leftRow, rightRow, 1);
    }
    return resultMatrix;
 }
 
 // returns a new Matrix that is the transpose of this Matrix 
-Matrix transpose()
+Matrix transpose(Matrix M)
 {
-   Matrix transposedMatrix = new Matrix(dimensions);
-   List currentRow = new List();
+   Matrix transposedMatrix = newMatrix(M->dimensions);
+   List currentRow = newList();
 
    int column = 0;
    double currentData = 0.0;
 
-   for( int row = 0; row <= dimensions; row++ )
+   for( int row = 0; row <= M->dimensions; row++ )
    {
-      currentRow = rows[row];
+      currentRow = M->rows[row];
 
-      for( currentRow.moveFront();
-           currentRow.index() != -1;
-           currentRow.moveNext()
+      for( moveFront(currentRow);
+           index(currentRow) != -1;
+           moveNext(currentRow)
       ){
-         column = ((Entry) currentRow.get()).columnNumber;
-         currentData =  ((Entry) currentRow.get()).data;
+         column = columnNumber(get(currentRow));
+         currentData = getData(get(currentRow)); // May need to define getData()
 
-         transposedMatrix.changeEntry(column, row, currentData); // index invert
+         changeEntry(transposedMatrix, column, row, currentData); // index invert
       }
    }
    return transposedMatrix;
@@ -348,9 +348,9 @@ Matrix transpose()
 // mult()
 // returns a new Matrix that is the product of this Matrix with M
 // pre: getSize()==M.getSize()
-Matrix mult(Matrix M)
+Matrix mult(Matrix L, Matrix R)
 {
-   if( getSize() != M.getSize() )
+   if( getSize(L) != getSize(R) )
    {
       throw new RuntimeException("Error: Program: Sparse, module: Matrix," 
                                      + " precondition: mult() called with"
@@ -358,23 +358,23 @@ Matrix mult(Matrix M)
    }
    double entryData;
     
-   Matrix resultMatrix = new Matrix(dimensions);
-   Matrix transposedM = new Matrix(dimensions);
+   Matrix resultMatrix = newMatrix(L->dimensions);
+   Matrix transposedR = newMatrix(L->dimensions);
 
-   List leftList = new List();
-   List rightList = new List();
+   List leftList = newList();
+   List rightList = newList();
 
-   transposedM = M.transpose();
+   transposedR = transpose(R);
 
-   for( int row = 1; row <= dimensions; row++ )
+   for( int row = 1; row <= L->dimensions; row++ )
    {
-      leftList = (List) rows[row];
+      leftList = L->rows[row];
        
       for( int column = 1; column <= dimensions; column++ )
       {
-         rightList = (List) transposedM.rows[column];
+         rightList = transposedR->rows[column];
          entryData = dot( leftList, rightList );
-         resultMatrix.changeEntry(row, column, entryData);
+         changeEntry(resultMatrix, row, column, entryData);
       }
    }
    return resultMatrix;  
@@ -384,50 +384,50 @@ Matrix mult(Matrix M)
 
 // toString()
 // Overides Object's toString() method.
-String toString()
+FILE * toString(Matrix M, FILE * file) // no idea how to implement
 {
-   StringBuffer sb = new StringBuffer();
+   FILE sb = NULL; // don't know how to init.
 
-   for(int i = 1; i <=  dimensions; i++)
+   for(int i = 1; i <= M->dimensions; i++)
    {
-       if( rows[i].length() != 0 )
-       {
-          sb.append(i+":");	 
-          sb.append( (rows[i]).toString() );
-          sb.append("\n");
+      if( length(M->rows[i]) != 0 )
+      {
+         append(sb, ":");	 
+         append( sb, toString(rows[i]) );
+         append(sb, "\n"); 
       }
    }
-   return new String(sb);
+   return sb;
 }
 
 // dot()
 // Takes the dot product of two lists.
-private static double dot(List P, List Q)
+double dot(List P, List Q)
 {
    double returnValue = 0;
    
    int columnP = 0, columnQ = 0;
 
-   P.moveFront();
-   Q.moveFront();
-   while( P.index() != -1 && Q.index() != -1 )
+   moveFront(P);
+   moveFront(Q);
+   while( index(P) != -1 && index(Q) != -1 )
    {
-      columnP = ((Entry) P.get()).getColumn();
-      columnQ = ((Entry) Q.get()).getColumn();
+      columnP = getColumn(get(P));
+      columnQ = getColumn(get(Q));
 
       if( columnP == columnQ )
       {
-         returnValue += ((Entry) P.get()).data * ((Entry) Q.get()).data;
-         P.moveNext();
-         Q.moveNext();
+         returnValue += getData( get(P) ) * getData( get(Q) );
+         moveNext(P);
+         moveNext(Q);
       }
       else if( columnP < columnQ )
       {
-         P.moveNext();
+         moveNext(P);
       }
       else  /* columnQ < columnP */
       {
-         Q.moveNext();
+         moveNext(Q);
       }
    }
    return returnValue; 
@@ -435,128 +435,138 @@ private static double dot(List P, List Q)
    
 // Helper Functions --------------------------------------------------------
 
-List addHelper(List a, List b, boolean isSum)
+List addHelper(List a, List b, int isSum)
 {
-   List resultList = new List();
-   Entry resultEntry = new Entry(0,0.0); 
+   List resultList = newList();
+   Entry resultEntry = newEntry(0,0.0); 
    int columnNumberA = 0, columnNumberB = 0;
 
-   boolean areSameList = (a == b);
-   
-   if( a.length() == 0 && b.length() == 0 )
+   if( a == b )
+   {
+      areSameList = 0;
+   }
+   else
+   {
+      areSameList = 1;
+   }
+   if( length(a) == 0 && length(b) == 0 )
    {
       return resultList;
    }
-   else if( a.length() == 0 ) 
+   else if( length(a) == 0 ) 
    {
-      for( b.moveFront(); b.index() != -1; b.moveNext() )
+      for( moveFront(b); index(b) != -1; moveNext(b) )
       {
-         resultEntry.columnNumber = ((Entry) b.get()).getColumn();      
-         if( isSum )
+         resultEntry->columnNumber = getColumn(get(b));      
+         if( isSum  == 0)
          {
-            resultEntry.data = ((Entry) b.get()).getData();
+            resultEntry->data = getData(get(b));
          }
          else
          {
-            resultEntry.data = -1 * ((Entry) b.get()).getData();
+            resultEntry->data = -1 * getData(get(b));
          }
-         Entry newEntry = new Entry(resultEntry);
-         resultList.append( newEntry );
+         Entry newEntry = newEntry(resultEntry);
+         append( resultList, newEntry );
       }
       return resultList;
    }
-   else if( b.length() == 0 )
+   else if( length(b) == 0 )
    {
-      for( a.moveFront(); a.index() != -1; a.moveNext() )
+      for( moveFront(a); index(a) != -1; moveNext(a) )
       {
-         Entry newEntry = new Entry((Entry) a.get());
-         resultList.append( newEntry );
+         Entry newEntry = new Entry((Entry) get(a));
+         append( resultList, newEntry );
       }
       return resultList;
    }
-   a.moveFront();
-   b.moveFront();
-   while( a.index() != -1 && b.index() != -1 )
+   moveFront(a);
+   moveFront(b);
+   while( index(a) != -1 && index(b) != -1 )
    {
-      columnNumberA = ( (Entry) a.get() ).getColumn();
-      columnNumberB = ( (Entry) b.get() ).getColumn();
+      columnNumberA = getColumn(get(a));
+      columnNumberB = getColumn(get(b));
 
       if( columnNumberA == columnNumberB )
       {
-         resultEntry.columnNumber = columnNumberA;
-         if (isSum)
+         resultEntry->columnNumber = columnNumberA;
+         if (isSum == 0)
          {
-            resultEntry.data = ((Entry) a.get()).getData()
-                             + ((Entry) b.get()).getData();
+            resultEntry->data =  getData( get(a) ) + getData( get(b) );
          }
          else
          {
-            resultEntry.data = ((Entry) a.get()).getData()
-                             - ((Entry) b.get()).getData();
+            resultEntry->data = getData( get(a) ) - getData( get(b) );
          }
 
-	 Entry newEntry = new Entry(resultEntry);
-         if (resultEntry.data != 0.0) resultList.append( newEntry );
-            a.moveNext();
-         if ( !areSameList ) b.moveNext();
+	 Entry newEntry = newEntry(resultEntry);
+         if (resultEntry->data != 0.0)
+         {
+	    append(resultList, newEntry);
+         }
+         moveNext(a);
+         if ( areSameList == 1 )
+         {
+            moveNext(b);
+	 }
       }
       else if( columnNumberA < columnNumberB  )
       {
-         Entry newEntry = new Entry((Entry) a.get());
-         resultList.append( newEntry );
-         a.moveNext();
+         Entry newEntry = newEntry( get(a) );
+         append(resultList, newEntry);
+         moveNext(a);
       }
       else
       {
-         resultEntry.columnNumber = ((Entry) b.get()).getColumn();
+         resultEntry.columnNumber = getColumn(get(b));
 
-	 if( isSum )
+	 if( isSum == 0)
          {
-            resultEntry.data = ((Entry) b.get()).getData();
+            resultEntry->data = getData(get(b));
          } 
          else
          {
-            resultEntry.data = -1 * ((Entry) b.get()).getData();
+            resultEntry->data = -1 * getData( get(b) );
          }
-         Entry newEntry = new Entry(resultEntry);
-         resultList.append( newEntry );
-         b.moveNext();
+         Entry newEntry = newEntry(resultEntry);
+         append(resultList, newEntry);
+         moveNext(b);
       }
    }
-   if( a.index() != -1 )
+   if( index(a) != -1 )
    {
       do
       {
-         Entry newEntry = new Entry((Entry) a.get());
-         resultList.append( newEntry );
-         a.moveNext();
+         Entry newEntry = newEntry(get(a));
+         append( newEntry );
+         moveNext(a);
       }
-      while( a.index() != -1 );
+      while( index(a) != -1 );
    }
-   if( b.index() != -1) 
+   if( index(b) != -1) 
    {
-      if( isSum )
+      if( isSum == 0 )
       {
          do
          {
-            Entry newEntry = new Entry((Entry) b.get());
-            resultList.append( newEntry );
-            b.moveNext();
+            Entry newEntry = newEntry( get(b) );
+            append( resultList, newEntry );
+            moveNext( b );
          }
-         while( b.index() != -1 );
+         while( index(b) != -1 );
       }
       else 
       {
          do
          {
-            resultEntry.data = -1 * ((Entry) b.get()).getData();
-            resultEntry.columnNumber = ((Entry) b.get()).getColumn();
+            resultEntry.data = -1 * getData( get(b) );
+            resultEntry.columnNumber = getColumn( get(b) );
 
-	    Entry newEntry = new Entry( resultEntry );
-            resultList.append( newEntry );
-            b.moveNext();
+	    Entry newEntry = newEntry( resultEntry );
+            append(resultList, newEntry);
+            moveNext(b);
          }
-         while( b.index() != -1 );
+         while( index(b) != -1 );
       }
    }
 return resultList;
