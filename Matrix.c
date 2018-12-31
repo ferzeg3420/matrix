@@ -1,3 +1,11 @@
+/* ------------------------------------------------------------------------TODO
+
+-- Strip out the whole file and restart it to test that it compiles adding each function one at a time.
+
+-- Don't forget to sort out the functions I commented out.
+
+-----------------------------------------------------------------------------*/
+
 // Matrix.java
 // Fernando Zegada
 // 1673862
@@ -6,17 +14,22 @@
 // defined for square matrices. The particular implementation is for sparse
 // matrices using arrays of lists.
 
-#define "Heap.h"
+#include <stdbool.h>
+#include "Heap.h"
 
 // Entry struct -------------------------------------------------------------------
 
 typedef struct EntryObj
 {
-double data; // changed for object.
-int columnNumber; 
+   double data; // changed for object.
+   int columnNumber; 
 } EntryObj;
       
 // Constructors and destructors ---------------------------------------------------
+
+// newEntry()
+// creates a new entry object.
+// preconditions:
 Entry newEntry(int columnNumber, double data)
 {
    Entry E;
@@ -26,7 +39,10 @@ Entry newEntry(int columnNumber, double data)
    return E;
 }
 
-Entry Entry(Entry other) // changed int to object.
+// copyEntry()
+// copies a new entry object.
+// preconditions: 
+Entry copyEntry(Entry other) // changed int to object.
 {
    Entry E = malloc(sizeof(EntryObj));
    E->data = other->data;
@@ -34,24 +50,32 @@ Entry Entry(Entry other) // changed int to object.
    return E;
 }
 
+// getColumn()
+// returns the column field in an entry struct.
 int getColumn(Entry E)
 {
    return E->columnNumber;
 }
 
+// getData()
+// returns the data field in an entry struct.
 double getData(Entry E)
 {
    return E->data;
 }
 
+// setData()
+// changes the value in the data field of the entry.
 void setData(Entry E, double x)
 {
    E->data = x;
 }
- 
-FILE* toString(FILE *file)
+
+// toString()
+// stringifies an entry
+void toString(Entry E, FILE *file)
 {
-   scanf(file, "(%d, %d)", columnNumber);
+   scanf(file, "(%d, %d)", E->columnNumber, E->data);
    return file;
 }
       
@@ -84,7 +108,7 @@ List[] rows;
 
 // Contructors --------------------------------------------------------------------
 
-// Matrix()
+// newMatrix()
 // Precondition n >= 1. 
 Matrix newMatrix(int n)
 {
@@ -105,16 +129,40 @@ Matrix newMatrix(int n)
    }
 }
 
+// copyMatrix()
+// Deep-copies a matrix.
+Matrix copyMatrix(Matrix M)
+{
+   Matrix Copy = newMatrix(L->dimensions);
+   List thisRow = newList();
+ 
+   int thisColumn;
+   double thisData;
 
+   for( int i = 1; i <= M->dimensions; i++ )
+   {
+      thisRow = L->rows[i];
+  
+      for( moveFront(thisRow); index(thisRow)!= -1; moveNext(thisRow) )
+      {
+         thisColumn = getColumn(get(thisRow));
+         thisData = getData(get(thisRow));
+         changeEntry(copy, i, thisColumn, thisData);
+      }
+   }
+   return matrixCopy;
+}
 // Access Functions ---------------------------------------------------------------
 
-   // Returns the dimensions of the matrix.
+// getSize()
+// Returns the size of the Matrix (the dimensions).
 int getSize(Matrix M)
 { 
    return M->dimensions; 
 }
-    
-   // Returns the number of nonzero entries of the matrix.
+
+// getNNZ()
+// Returns the number of non-zero entries.
 int getNNZ(Matrix M)
 {
    int counter = 0;
@@ -125,8 +173,9 @@ int getNNZ(Matrix M)
    return counter;
 }
 
+// equals()
 // Returns true if two matrices are equal. False otherwise.
-boolean equals(Matrix L, Matrix R)
+bool equals(Matrix L, Matrix R)
 {
    List left = newList();
    List right = newList();
@@ -166,36 +215,15 @@ boolean equals(Matrix L, Matrix R)
     
 // Manipulation procedures -------------------------------------------------
 
-// sets this Matrix to the zero state
+// makeZero()
+// Puts the matrix back to its initial condition wehere there are no non-zero
+// entries.
 void makeZero(Matrix M)
 {
    for( int i = 1; i <= M->dimensions; i++ ) 
    {
       clear(M->rows[i]);
    }
-}
-
-   // returns a new Matrix having the same entries as this Matrix 
-Matrix copy(Matrix L, Matrix R)
-{
-   Matrix Copy = newMatrix(L->dimensions);
-   List thisRow = newList();
- 
-   int thisColumn;
-   double thisData;
-
-   for( int i = 1; i <= M->dimensions; i++ )
-   {
-      thisRow = L->rows[i];
-  
-      for( moveFront(thisRow); index(thisRow)!= -1; moveNext(thisRow) )
-      {
-         thisColumn = getColumn(get(thisRow));
-         thisData = getData(get(thisRow));
-         changeEntry(copy, i, thisColumn, thisData);
-      }
-   }
-   return matrixCopy;
 }
 
 // changeEntry()
@@ -242,7 +270,7 @@ void changeEntry(Matrix M, int i, int j, double x)
    }
 }
 
-// Sort of done translating until here. Pick up from here.
+// scalarMult()
 // returns a new Matrix that is the scalar product of this Matrix with x
 Matrix scalarMult(Matrix M, double x)
 {
@@ -272,6 +300,7 @@ Matrix scalarMult(Matrix M, double x)
    return resultMatrix;
 }
 
+// add()
 // returns a new Matrix that is the sum of this Matrix with M
 // pre: getSize()==M.getSize()
 Matrix add(Matrix L, Matrix R)
@@ -319,6 +348,7 @@ Matrix sub(Matrix L, Matrix R)
    return resultMatrix;
 }
 
+// transpose()
 // returns a new Matrix that is the transpose of this Matrix 
 Matrix transpose(Matrix M)
 {
@@ -384,21 +414,21 @@ Matrix mult(Matrix L, Matrix R)
 
 // toString()
 // Overides Object's toString() method.
-FILE * toString(Matrix M, FILE * file) // no idea how to implement
-{
-   FILE sb = NULL; // don't know how to init.
+/* FILE * toString(Matrix M, FILE * file) // no idea how to implement */
+/* { */
+/*    FILE sb = NULL; // don't know how to init. */
 
-   for(int i = 1; i <= M->dimensions; i++)
-   {
-      if( length(M->rows[i]) != 0 )
-      {
-         append(sb, ":");	 
-         append( sb, toString(rows[i]) );
-         append(sb, "\n"); 
-      }
-   }
-   return sb;
-}
+/*    for(int i = 1; i <= M->dimensions; i++) */
+/*    { */
+/*       if( length(M->rows[i]) != 0 ) */
+/*       { */
+/*          append(sb, ":");	  */
+/*          append( sb, toString(rows[i]) ); */
+/*          append(sb, "\n");  */
+/*       } */
+/*    } */
+/*    return sb; */
+/* } */
 
 // dot()
 // Takes the dot product of two lists.
@@ -435,19 +465,22 @@ double dot(List P, List Q)
    
 // Helper Functions --------------------------------------------------------
 
-List addHelper(List a, List b, int isSum)
+// addHelper()
+// helper functions for add().
+List addHelper(List a, List b, bool isSum)
 {
    List resultList = newList();
    Entry resultEntry = newEntry(0,0.0); 
    int columnNumberA = 0, columnNumberB = 0;
+   bool areSameList = false;
 
    if( a == b )
    {
-      areSameList = 0;
+      areSameList = true;
    }
    else
    {
-      areSameList = 1;
+      areSameList = false;
    }
    if( length(a) == 0 && length(b) == 0 )
    {
@@ -458,7 +491,7 @@ List addHelper(List a, List b, int isSum)
       for( moveFront(b); index(b) != -1; moveNext(b) )
       {
          resultEntry->columnNumber = getColumn(get(b));      
-         if( isSum  == 0)
+         if( isSum )
          {
             resultEntry->data = getData(get(b));
          }
@@ -490,7 +523,7 @@ List addHelper(List a, List b, int isSum)
       if( columnNumberA == columnNumberB )
       {
          resultEntry->columnNumber = columnNumberA;
-         if (isSum == 0)
+         if( isSum )
          {
             resultEntry->data =  getData( get(a) ) + getData( get(b) );
          }
@@ -520,7 +553,7 @@ List addHelper(List a, List b, int isSum)
       {
          resultEntry.columnNumber = getColumn(get(b));
 
-	 if( isSum == 0)
+	 if( isSum )
          {
             resultEntry->data = getData(get(b));
          } 
@@ -545,7 +578,7 @@ List addHelper(List a, List b, int isSum)
    }
    if( index(b) != -1) 
    {
-      if( isSum == 0 )
+      if( isSum )
       {
          do
          {

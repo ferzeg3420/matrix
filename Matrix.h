@@ -1,9 +1,9 @@
 #ifndef _MATRIX_H_INCLUDE_
 #define _MATRIX_H_INCLUDE_
 
-// Exported type --------------------------------------------------------------
+// Entry type -----------------------------------------------------------------
 
-typedef struct MatrixObj* Matrix;
+// Exported type --------------------------------------------------------------
 
 typedef struct EntryObj* Entry;
 
@@ -11,56 +11,89 @@ typedef struct EntryObj* Entry;
 
 // newEntry()
 // creates a new entry object.
-// preconditions:
+// preconditions: 
 Entry newEntry(int columnNumber, double data); // changed int to object.
-Entry Entry(Entry other); // copy Constructor?
 
-// newEntry()
-// creates a new entry object.
+// copyEntry()
+// Deep-copies a new entry object.
+// preconditions: 
+Entry copyEntry(Entry other);
+
+// Access Functions -----------------------------------------------------------
+// getColumn()
+// returns the column field in an entry struct.
+int getColumn(Entry E);
+
+// getData()
+// returns the data field in an entry struct.
+double getData(Entry E);
+
+// Manipulation procedures -------------------------------------------------
+
+// setData()
+// changes the value in the data field of the entry.
+void setData(Entry E, double x);
+
+// toString()
+// stringifies an entry
+void toString(Entry E, FILE *file);
+
+// Matrix type ----------------------------------------------------------------
+
+// Exported type --------------------------------------------------------------
+
+typedef struct MatrixObj* Matrix;
+
+// Contructors and destructors ------------------------------------------------
+
+// newMatrix()
+// creates a new Matrix object.
 // Precondition n >= 1.
 Matrix newMatrix(int n);
+
+// copyMatrix()
+// Deep-copies a matrix.
+Matrix copyMatrix(Matrix M);
 
 // Access Functions -----------------------------------------------------------
 
 // getSize()
 // Returns the size of the Matrix (the dimensions).
-int getSize();
+int getSize(Matrix M);
 
 // getNNZ()
 // Returns the number of non-zero entries.
-int getNNZ();
+int getNNZ(Matrix M);
 
 // equals()
-// Returns true if two matrices are equal. False otherwise.
-boolean equals(Object x);
+// Returns true if two matrices are equal. False otherwise. ?
+bool equals(Matrix L, Matrix R);
+
+// Manipulation procedures -------------------------------------------------
 
 // makeZero()
 // Puts the matrix back to its initial condition wehere there are no non-zero
 // entries.
-void makeZero();
-
-// copy()
-// 
-Matrix copy();
+void makeZero(Matrix M);
 
 // changeEntry()
 // changes ith row, jth column of this Matrix to x
 // pre: 1<=i<=getSize(), 1<=j<=getSize()
-void changeEntry(int i, int j, double x);
+void changeEntry(Matrix M, int i, int j, double x);
 
 // scalarMult()
 // returns a new Matrix that is the scalar product of this Matrix with x
-Matrix scalarMult(double x);
+Matrix scalarMult(Matrix M, double x);
 
 // add()	 
 // returns a new Matrix that is the sum of this Matrix with M
 // pre: getSize()==M.getSize()
-Matrix add(Matrix M);
+Matrix add(Matrix L, Matrix R);
 
 // sub()
 // returns a new Matrix that is the difference of this Matrix with M
 // pre: getSize()==M.getSize()
-Matrix sub(Matrix M);
+Matrix sub(Matrix L, Matrix R);
 
 // transpose()
 // returns a new Matrix that is the transpose of this Matrix 
@@ -79,12 +112,12 @@ Matrix mult(Matrix M);
 
 // dot()
 // Takes the dot product of two lists.
-static double dot(List P, List Q);
+double dot(List P, List Q);
    
 // Helper Functions --------------------------------------------------------
 
 // addHelper()
 // helper functions for add().
-List addHelper(List a, List b, boolean isSum);
+List addHelper(List a, List b, bool isSum);
 
 #endif
