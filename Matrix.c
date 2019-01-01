@@ -15,13 +15,16 @@
 // matrices using arrays of lists.
 
 #include <stdbool.h>
-#include "Heap.h"
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include "Matrix.h"
 
 // Entry struct -------------------------------------------------------------------
 
 typedef struct EntryObj
 {
-   double data; // changed for object.
+   double data;
    int columnNumber; 
 } EntryObj;
       
@@ -44,6 +47,12 @@ Entry newEntry(int columnNumber, double data)
 // preconditions: 
 Entry copyEntry(Entry other) // changed int to object.
 {
+   if( other == NULL )
+   {
+      printf("Matrix error: calling entrie's copyEntry() on null entry as"
+             " argument.");
+      exit(1);
+   }
    Entry E = malloc(sizeof(EntryObj));
    E->data = other->data;
    E->columnNumber = other->columnNumber;
@@ -54,6 +63,11 @@ Entry copyEntry(Entry other) // changed int to object.
 // returns the column field in an entry struct.
 int getColumn(Entry E)
 {
+   if( E == NULL )
+   {
+      printf("Matrix error: calling entrie's getColumn() on null entry");
+      exit(1);
+   }
    return E->columnNumber;
 }
 
@@ -61,6 +75,11 @@ int getColumn(Entry E)
 // returns the data field in an entry struct.
 double getData(Entry E)
 {
+   if( E == NULL )
+   {
+      printf("Matrix error: calling entrie's getData() on null entry");
+      exit(1);
+   }
    return E->data;
 }
 
@@ -68,17 +87,26 @@ double getData(Entry E)
 // changes the value in the data field of the entry.
 void setData(Entry E, double x)
 {
+   if( E == NULL )
+   {
+      printf("Matrix error: calling entrie's setData() on null entry");
+      exit(1);
+   }
    E->data = x;
 }
 
 // toString()
 // stringifies an entry
-void toString(Entry E, FILE *file)
+void toString(Entry E, FILE* out)
 {
-   scanf(file, "(%d, %d)", E->columnNumber, E->data);
-   return file;
+   if( E == NULL )
+   {
+      printf("Matrix error: calling entrie's toString() on null entry");
+      exit(1);
+   }
+   fprintf(out, "(%d, %f)", E->columnNumber, E->data);
 }
-      
+
 // equals(): overrides Object's equals() method
 /* int equals(Object x) */
 /* { */
@@ -102,11 +130,11 @@ void toString(Entry E, FILE *file)
 
 typedef struct MatrixObj
 {
-int dimensions;
-List[] rows;
+   int dimensions;
+   List[] rows;
 } MatrixObj;
 
-// Contructors --------------------------------------------------------------------
+// Contructors & destructors ------------------------------------------------------
 
 // newMatrix()
 // Precondition n >= 1. 
@@ -126,6 +154,22 @@ Matrix newMatrix(int n)
    for( int i = 0; i <= M->dimensions; i++) // <= because I am ignoring index 0
    {
       M->rows[i] = newList();
+   }
+}
+
+// freeMatrix()
+// free each list that represents a row and finally frees the memory of
+// the matrixObj itsef
+void freeMatrix(Matrix* pM)
+{
+   if(pM!=NULL && *pM!=NULL)
+   {
+      for( int i = 0; i <= (*pM)->dimensions; i++)
+      {
+         freeList((*pM)->rows[i]);
+      }
+      free(*pM);
+      *pM = NULL;
    }
 }
 

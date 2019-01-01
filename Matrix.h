@@ -1,6 +1,12 @@
 #ifndef _MATRIX_H_INCLUDE_
 #define _MATRIX_H_INCLUDE_
 
+#include <stdbool.h>
+#include "List.h"
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
 // Entry type -----------------------------------------------------------------
 
 // Exported type --------------------------------------------------------------
@@ -36,7 +42,7 @@ void setData(Entry E, double x);
 
 // toString()
 // stringifies an entry
-void toString(Entry E, FILE *file);
+void toString(Entry E, FILE* file);
 
 // Matrix type ----------------------------------------------------------------
 
@@ -50,6 +56,11 @@ typedef struct MatrixObj* Matrix;
 // creates a new Matrix object.
 // Precondition n >= 1.
 Matrix newMatrix(int n);
+
+// freeMatrix()
+// free each list that represents a row and finally frees the memory of
+// the matrixObj itsef
+void freeMatrix(Matrix* pM);
 
 // copyMatrix()
 // Deep-copies a matrix.
@@ -65,9 +76,9 @@ int getSize(Matrix M);
 // Returns the number of non-zero entries.
 int getNNZ(Matrix M);
 
-// equals()
+// matrixEquals()
 // Returns true if two matrices are equal. False otherwise. ?
-bool equals(Matrix L, Matrix R);
+bool matrixEquals(Matrix L, Matrix R);
 
 // Manipulation procedures -------------------------------------------------
 
