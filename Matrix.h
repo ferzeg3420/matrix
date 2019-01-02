@@ -44,6 +44,10 @@ void setData(Entry E, double x);
 // stringifies an entry
 void toString(Entry E, FILE* file);
 
+// areEntriesEqual()
+// test if entries are equivalent, their data members have the same values.
+bool areEntriesEqual(Entry L, Entry R);
+
 // Matrix type ----------------------------------------------------------------
 
 // Exported type --------------------------------------------------------------
@@ -78,7 +82,7 @@ int getNNZ(Matrix M);
 
 // matrixEquals()
 // Returns true if two matrices are equal. False otherwise. ?
-bool matrixEquals(Matrix L, Matrix R);
+bool areMatricesEqual(Matrix L, Matrix R);
 
 // Manipulation procedures -------------------------------------------------
 

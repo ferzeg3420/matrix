@@ -1,5 +1,9 @@
 /* ------------------------------------------------------------------------TODO
 
+-- fix the compile time errors that poped up.
+
+-- Fix the inner member of List so that it takes entries.
+
 -- Strip out the whole file and restart it to test that it compiles adding each function one at a time.
 
 -- Don't forget to sort out the functions I commented out.
@@ -107,20 +111,14 @@ void toString(Entry E, FILE* out)
    fprintf(out, "(%d, %f)", E->columnNumber, E->data);
 }
 
-// equals(): overrides Object's equals() method
-/* int equals(Object x) */
-/* { */
-/*    int eq = 0; */
-/*    Entry that; */
-
-/*    if(x instanceof Entry) */
-/*    { */
-/*        that = (Entry) x; */
-/*        eq =( (this.columnNumber == that.columnNumber) */
-/*        && (this.data == that.data) ); */
-/*    } */
-/*    return eq; */
-/* } */
+bool areEntriesEqual(Entry L, Entry R)
+{
+   if( (L->data == R->data) && (L->columnNumber == R->columnNumber) )
+   {
+      return true;
+   }
+   return false;
+}
 
 // End of Entry -------------------------------------------------------------------
 
@@ -210,16 +208,16 @@ int getSize(Matrix M)
 int getNNZ(Matrix M)
 {
    int counter = 0;
-   for( int i = 1; i <= dimensions; i++ )
+   for( int i = 1; i <= M->dimensions; i++ )
    {
       counter += length(M->rows[i]);
    }
    return counter;
 }
 
-// equals()
+// areMatricesEqual()
 // Returns true if two matrices are equal. False otherwise.
-bool equals(Matrix L, Matrix R)
+bool areMatricesEqual(Matrix L, Matrix R)
 {
    List left = newList();
    List right = newList();
@@ -246,7 +244,7 @@ bool equals(Matrix L, Matrix R)
 
       while( index(left) != -1 )
       {
-         if( !( equals(get(left), get(right)) ) )
+         if( !( areEntriesEqual(get(left), get(right)) ) )
          {
             return false;
          }
