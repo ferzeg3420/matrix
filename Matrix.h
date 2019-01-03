@@ -2,16 +2,17 @@
 #define _MATRIX_H_INCLUDE_
 
 #include <stdbool.h>
-#include "List.h"
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+#include "List.h"
 
 // Entry type -----------------------------------------------------------------
 
 // Exported type --------------------------------------------------------------
 
 typedef struct EntryObj* Entry;
+typedef struct ListObj* List;
 
 // Contructors and destructors ------------------------------------------------
 
