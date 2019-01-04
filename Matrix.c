@@ -1,9 +1,5 @@
 /* ------------------------------------------------------------------------TODO
 
--- fix the compile time errors that poped up.
-
--- Fix the inner member of List so that it takes entries.
-
 -- Strip out the whole file and restart it to test that it compiles adding each function one at a time.
 
 -- Don't forget to sort out the functions I commented out.
@@ -99,13 +95,13 @@ void setData(Entry E, double x)
    E->data = x;
 }
 
-// toString()
+// entryToString()
 // stringifies an entry
-void toString(Entry E, FILE* out)
+void entryToString(Entry E, FILE* out)
 {
    if( E == NULL )
    {
-      printf("Matrix error: calling entrie's toString() on null entry");
+      printf("Matrix error: calling Entry's toString() on null entry");
       exit(1);
    }
    fprintf(out, "(%d, %f)", E->columnNumber, E->data);
@@ -280,9 +276,9 @@ void changeEntry(Matrix M, int i, int j, double x)
       exit(1);
    }
    Entry E = newEntry(j, x);
-   if( rows[i].length() != 0 )
+   if( M->rows[i].length() != 0 )
    {
-      for( moveFront(M->rows[i]); index(M->rows[i]) >= 0; moveNext(M->rows[i]) )
+      for( moveFront(M->rows[i]); Index(M->rows[i]) != -1; moveNext(M->rows[i]) )
       {
          if( getColumn(get(M->rows[i])) == j )
          {
@@ -296,17 +292,17 @@ void changeEntry(Matrix M, int i, int j, double x)
             }
             break;
          }
-      if(  getColumn( get(M->rows[i]) ) > j )
+         if(  getColumn( get(M->rows[i]) ) > j )
          {
             if( x != 0 )
             {
-               insertBefore(M->rows[i],E);
+               insertBefore(M->rows[i], E);
             }
             break;
          }
       }
    }
-   if( index(M->rows[i]) == -1 && x != 0 )
+   if( Index(M->rows[i]) == -1 && x != 0 )
    {
       append(M->rows[i], E);
    }
@@ -454,23 +450,20 @@ Matrix mult(Matrix L, Matrix R)
 
 // Other Functions ---------------------------------------------------------
 
-// toString()
-// Overides Object's toString() method.
-/* FILE * toString(Matrix M, FILE * file) // no idea how to implement */
-/* { */
-/*    FILE sb = NULL; // don't know how to init. */
-
-/*    for(int i = 1; i <= M->dimensions; i++) */
-/*    { */
-/*       if( length(M->rows[i]) != 0 ) */
-/*       { */
-/*          append(sb, ":");	  */
-/*          append( sb, toString(rows[i]) ); */
-/*          append(sb, "\n");  */
-/*       } */
-/*    } */
-/*    return sb; */
-/* } */
+// matrixToString()
+// returns a text representation of the matrix.
+void matrixToString(Matrix M, FILE * out) 
+{
+   for(int i = 1; i <= M->dimensions; i++)
+   {
+      if( length(M->rows[i]) != 0 )
+      {
+         fprintf(out, ":");
+         fprintf( out, listToString(rows[i]) );
+         fprintf(out, "\n");
+      }
+   }
+}
 
 // dot()
 // Takes the dot product of two lists.

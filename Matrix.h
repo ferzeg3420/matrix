@@ -122,9 +122,9 @@ Matrix mult(Matrix M);
 
 // Other Functions ---------------------------------------------------------
 
-// toString()
+// matrixToString()
 // returns a text representation of the matrix.
-// toString();
+matrixToString();
 
 // dot()
 // Takes the dot product of two lists.
