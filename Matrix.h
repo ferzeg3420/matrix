@@ -113,18 +113,18 @@ Matrix sub(Matrix L, Matrix R);
 
 // transpose()
 // returns a new Matrix that is the transpose of this Matrix 
-Matrix transpose();
+Matrix transpose(Matrix M);
     
 // mult()
 // returns a new Matrix that is the product of this Matrix with M
 // pre: getSize()==M.getSize()
-Matrix mult(Matrix M);
+Matrix mult(Matrix L, Matrix R);
 
 // Other Functions ---------------------------------------------------------
 
 // matrixToString()
 // returns a text representation of the matrix.
-matrixToString();
+void matrixToString(Matrix M, FILE * out);
 
 // dot()
 // Takes the dot product of two lists.

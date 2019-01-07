@@ -1,12 +1,3 @@
-/* ------------------------------------------------------------------------TODO
-
--- Strip out the whole file and restart it to test that it compiles adding each
- function one at a time.
-
--- Don't forget to sort out the functions I commented out.
-
------------------------------------------------------------------------------*/
-
 // Matrix.java
 // Fernando Zegada
 // 1673862
@@ -16,11 +7,11 @@
 // matrices using arrays of lists.
 
 #include <stdbool.h>
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "Matrix.h"
-
+#include "List.h"
 // Entry struct -------------------------------------------------------------------
 
 typedef struct EntryObj
@@ -102,12 +93,14 @@ void entryToString(Entry E, FILE* out)
 {
    if( E == NULL )
    {
-      printf("Matrix error: calling Entry's toString() on null entry");
+      printf("Matrix error: calling entrie's toString() on null entry");
       exit(1);
    }
    fprintf(out, "(%d, %f)", E->columnNumber, E->data);
 }
 
+// areEntriesEqual()
+// test if entries are equivalent, their data members have the same values.
 bool areEntriesEqual(Entry L, Entry R)
 {
    if( (L->data == R->data) && (L->columnNumber == R->columnNumber) )
@@ -126,10 +119,10 @@ bool areEntriesEqual(Entry L, Entry R)
 typedef struct MatrixObj
 {
    int dimensions;
-   List[] rows;
+   List* rows;
 } MatrixObj;
 
-// Contructors & destructors ------------------------------------------------------
+// Contructors --------------------------------------------------------------------
 
 // newMatrix()
 // Precondition n >= 1. 
@@ -150,6 +143,7 @@ Matrix newMatrix(int n)
    {
       M->rows[i] = newList();
    }
+   return M;
 }
 
 // freeMatrix()
@@ -161,7 +155,7 @@ void freeMatrix(Matrix* pM)
    {
       for( int i = 0; i <= (*pM)->dimensions; i++)
       {
-         freeList((*pM)->rows[i]);
+         freeList( &( (*pM)->rows[i] ) );
       }
       free(*pM);
       *pM = NULL;
@@ -170,27 +164,28 @@ void freeMatrix(Matrix* pM)
 
 // copyMatrix()
 // Deep-copies a matrix.
-Matrix copyMatrix(Matrix M)
-{
-   Matrix Copy = newMatrix(L->dimensions);
-   List thisRow = newList();
+/* Matrix copyMatrix(Matrix M) */
+/* { */
+/*    Matrix Copy = newMatrix(M->dimensions); */
+/*    List thisRow = newList(); */
  
-   int thisColumn;
-   double thisData;
+/*    int thisColumn; */
+/*    double thisData; */
 
-   for( int i = 1; i <= M->dimensions; i++ )
-   {
-      thisRow = L->rows[i];
+/*    for( int i = 1; i <= M->dimensions; i++ ) */
+/*    { */
+/*       thisRow = L->rows[i]; */
   
-      for( moveFront(thisRow); index(thisRow)!= -1; moveNext(thisRow) )
-      {
-         thisColumn = getColumn(get(thisRow));
-         thisData = getData(get(thisRow));
-         changeEntry(copy, i, thisColumn, thisData);
-      }
-   }
-   return matrixCopy;
-}
+/*       for( moveFront(thisRow); Index(thisRow)!= -1; moveNext(thisRow) ) */
+/*       { */
+/*          thisColumn = getColumn(get(thisRow)); */
+/*          thisData = getData(get(thisRow)); */
+/*          changeEntry(copy, i, thisColumn, thisData); */
+/*       } */
+/*    } */
+/*    return matrixCopy; */
+/* } */  // TEST WHEN CHANGE ENTRY IS READY!
+
 // Access Functions ---------------------------------------------------------------
 
 // getSize()
@@ -239,7 +234,7 @@ bool areMatricesEqual(Matrix L, Matrix R)
       moveFront(left);
       moveFront(right);
 
-      while( index(left) != -1 )
+      while( Index(left) != -1 )
       {
          if( !( areEntriesEqual(get(left), get(right)) ) )
          {
@@ -248,10 +243,10 @@ bool areMatricesEqual(Matrix L, Matrix R)
          moveNext(left);
          moveNext(right);
       }
+   }
    return true;
 }
 
-    
 // Manipulation procedures -------------------------------------------------
 
 // makeZero()
@@ -259,11 +254,11 @@ bool areMatricesEqual(Matrix L, Matrix R)
 // entries.
 void makeZero(Matrix M)
 {
-   for( int i = 1; i <= M->dimensions; i++ ) 
+   for( int i = 1; i <= M->dimensions; i++ )
    {
       clear(M->rows[i]);
    }
-}
+} // DON'T FORGET TO TEST WHEN CHANGEENTRY IS COMPLETE ON NON-EMPTY MATRICES.
 
 // changeEntry()
 // pre: 1<=i<=getSize(), 1<=j<=getSize()
@@ -277,34 +272,38 @@ void changeEntry(Matrix M, int i, int j, double x)
       exit(1);
    }
    Entry E = newEntry(j, x);
-   if( M->rows[i].length() != 0 )
+   if( length(M->rows[i]) != 0.0 )
    {
       for( moveFront(M->rows[i]); Index(M->rows[i]) != -1; moveNext(M->rows[i]) )
       {
          if( getColumn(get(M->rows[i])) == j )
          {
-            if( x == 0 )
+            if( x == 0.0 )
             {
+               printf("Case 3 x= %f\n", x); // debug
                delete(M->rows[i]);
             }
             else
             {
-               setData(get(M->rows[i])), x);
+               printf("Case 4 x= %f\n", x); // debug
+               setData( get( M->rows[i] ), x ); 
             }
             break;
          }
-         if(  getColumn( get(M->rows[i]) ) > j )
+         if(  getColumn( get(M->rows[i]) )  > j ) 
          {
-            if( x != 0 )
+            if( x != 0.0 )
             {
+               printf("Case 2 x= %f\n", x); // debug
                insertBefore(M->rows[i], E);
             }
             break;
          }
       }
    }
-   if( Index(M->rows[i]) == -1 && x != 0 )
+   if( Index(M->rows[i]) == -1 && x != 0 ) // Case 1
    {
+      printf("Case 1 x= %f\n", x); // debug
       append(M->rows[i], E);
    }
 }
@@ -413,8 +412,8 @@ Matrix transpose(Matrix M)
    }
    return transposedMatrix;
 }
-    
-// mult()
+
+// Mult()
 // Returns a new Matrix that is the product of this Matrix with M
 // pre: getSize()==M.getSize()
 Matrix mult(Matrix L, Matrix R)
@@ -453,16 +452,16 @@ Matrix mult(Matrix L, Matrix R)
 
 // matrixToString()
 // returns a text representation of the matrix.
-void matrixToString(Matrix M, FILE * out) 
+void matrixToString(Matrix M, FILE * out)
 {
    for(int i = 1; i <= M->dimensions; i++)
    {
+      fprintf(out, "%d:", i);      
       if( length(M->rows[i]) != 0 )
       {
-         fprintf(out, ":");
-         fprintf( out, listToString(rows[i]) );
-         fprintf(out, "\n");
+         listToString(M->rows[i], out );
       }
+      fprintf(out, "\n");
    }
 }
 
@@ -476,7 +475,7 @@ double dot(List P, List Q)
 
    moveFront(P);
    moveFront(Q);
-   while( index(P) != -1 && index(Q) != -1 )
+   while( Index(P) != -1 && Index(Q) != -1 )
    {
       columnP = getColumn(get(P));
       columnQ = getColumn(get(Q));
@@ -498,7 +497,7 @@ double dot(List P, List Q)
    }
    return returnValue; 
 }
-   
+
 // Helper Functions --------------------------------------------------------
 
 // addHelper()
