@@ -132,7 +132,7 @@ int main(int argc, char* argv[])
    printf("Matrix SM:\n");
    matrixToString(SM, stdout);
    printf("Matrix AM:\n");
-   matrixToString(SM, stdout);
+   matrixToString(AM, stdout);
 
    if( areMatricesEqual(M, OM) )
    {
@@ -207,7 +207,21 @@ int main(int argc, char* argv[])
    OM = sub(AM, AM);
    printf("Testing sub(AM, AM):\n");   
    matrixToString(OM, stdout);
-   
+
+   // matrixCopy() tests -------------------------------------------------------
+
+   OM = copyMatrix( sub( add(M, M), M) );
+   printf("Testing copyMatrix(M+M-M):\n");   
+   matrixToString(OM, stdout);
+
+   printf("doing copyMatrix(M) to test deep copy.\n");   
+   OM = copyMatrix(M);
+   printf("M[1,1] = 11\n");   
+   changeEntry(M, 1, 1, 11.0); // Case 1
+   printf("M:\n");   
+   matrixToString(M, stdout);
+   printf("copied M:\n");   
+   matrixToString(OM, stdout);
    // makeZero() test ----------------------------------------------------------
 
    makeZero(M);
@@ -220,6 +234,10 @@ int main(int argc, char* argv[])
    
    printf("Ping\n");
    freeMatrix(&M);
+   freeMatrix(&AM);
+   freeMatrix(&OM);
+   freeMatrix(&SM);
+   
    return(0);
 }
 

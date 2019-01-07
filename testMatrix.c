@@ -1,7 +1,5 @@
-// Matrix.java
+// Matrix.c
 // Fernando Zegada
-// 1673862
-// pa3
 // Matrix implements a linear algebra matrix with its addition, multiplication
 // defined for square matrices. The particular implementation is for sparse
 // matrices using arrays of lists.
@@ -12,6 +10,7 @@
 #include <string.h>
 #include "Matrix.h"
 #include "List.h"
+
 // Entry struct -------------------------------------------------------------------
 
 typedef struct EntryObj
@@ -93,7 +92,7 @@ void entryToString(Entry E, FILE* out)
 {
    if( E == NULL )
    {
-      printf("Matrix error: calling entrie's toString() on null entry");
+      printf("Matrix error: calling Entry's toString() on null entry");
       exit(1);
    }
    fprintf(out, "(%d, %f)", E->columnNumber, E->data);
@@ -164,27 +163,27 @@ void freeMatrix(Matrix* pM)
 
 // copyMatrix()
 // Deep-copies a matrix.
-/* Matrix copyMatrix(Matrix M) */
-/* { */
-/*    Matrix Copy = newMatrix(M->dimensions); */
-/*    List thisRow = newList(); */
+Matrix copyMatrix(Matrix M)
+{
+   Matrix matrixCopy = newMatrix(M->dimensions);
+   List thisRow = newList();
  
-/*    int thisColumn; */
-/*    double thisData; */
+   int thisColumn;
+   double thisData;
 
-/*    for( int i = 1; i <= M->dimensions; i++ ) */
-/*    { */
-/*       thisRow = L->rows[i]; */
+   for( int i = 1; i <= M->dimensions; i++ )
+   {
+      thisRow = M->rows[i];
   
-/*       for( moveFront(thisRow); Index(thisRow)!= -1; moveNext(thisRow) ) */
-/*       { */
-/*          thisColumn = getColumn(get(thisRow)); */
-/*          thisData = getData(get(thisRow)); */
-/*          changeEntry(copy, i, thisColumn, thisData); */
-/*       } */
-/*    } */
-/*    return matrixCopy; */
-/* } */  // TEST WHEN CHANGE ENTRY IS READY!
+      for( moveFront(thisRow); Index(thisRow)!= -1; moveNext(thisRow) )
+      {
+         thisColumn = getColumn(get(thisRow));
+         thisData = getData(get(thisRow));
+         changeEntry(matrixCopy, i, thisColumn, thisData);
+      }
+   }
+   return matrixCopy;
+}
 
 // Access Functions ---------------------------------------------------------------
 
@@ -357,7 +356,7 @@ Matrix add(Matrix L, Matrix R)
    {
       leftRow = L->rows[i];
       rightRow = R->rows[i];
-      resultMatrix->rows[i] = addHelper(leftRow, rightRow, 0);
+      resultMatrix->rows[i] = addHelper(leftRow, rightRow, true);
    }
    return resultMatrix;
 }
@@ -381,7 +380,7 @@ Matrix sub(Matrix L, Matrix R)
    {
       leftRow = L->rows[i];
       rightRow = R->rows[i];
-      resultMatrix->rows[i] = addHelper(leftRow, rightRow, 1);
+      resultMatrix->rows[i] = addHelper(leftRow, rightRow, false);
    }
    return resultMatrix;
 }
@@ -413,7 +412,7 @@ Matrix transpose(Matrix M)
    return transposedMatrix;
 }
 
-// Mult()
+// mult()
 // Returns a new Matrix that is the product of this Matrix with M
 // pre: getSize()==M.getSize()
 Matrix mult(Matrix L, Matrix R)
@@ -534,9 +533,9 @@ List addHelper(List a, List b, bool isSum)
          {
             resultEntry->data = -1 * getData(get(b));
          }
-         //Entry NewEntry = newEntry(resultEntry);
-	 //         append( resultList, NewEntry );
-	 append(resultList, resultEntry);
+         Entry NewEntry = copyEntry(resultEntry);
+	 append( resultList, NewEntry );
+	 // append(resultList, resultEntry);
       }
       return resultList;
    }
@@ -544,11 +543,11 @@ List addHelper(List a, List b, bool isSum)
    {
       for( moveFront(a); Index(a) != -1; moveNext(a) )
       {
-	 resultEntry->data = getData( get(a) );
-         resultEntry->columnNumber = getColumn( get(a) );
-	 //         Entry NewEntry = newEntry( get(a) );
-	 //         append( resultList, NewEntry );
-	 append(resultList, resultEntry);
+	 /* resultEntry->data = getData( get(a) ); */   // uncomment to test errors!!!!!!!!!
+         /* resultEntry->columnNumber = getColumn( get(a) ); */
+	 Entry NewEntry = copyEntry( get(a) );
+	 append( resultList, NewEntry );
+ 	 /* append(resultList, resultEntry); */
       }
       return resultList;
    }
@@ -571,27 +570,28 @@ List addHelper(List a, List b, bool isSum)
             resultEntry->data = getData( get(a) ) - getData( get(b) );
          }
 
-	 //	 Entry NewEntry = newEntry(resultEntry);
+	 Entry NewEntry = copyEntry(resultEntry);
     	 
          if (resultEntry->data != 0.0)
          {
-	    //	    append(resultList, NewEntry);
-            append(resultList, resultEntry);
+	    append(resultList, NewEntry);
+            /* append(resultList, resultEntry); */
          }
          moveNext(a);
-         if ( areSameList == 1 )
+         if ( !areSameList )
          {
+	    printf("moved next.\n");
             moveNext(b);
 	 }
       }
       else if( columnNumberA < columnNumberB  )
       {
-	 //         Entry NewEntry = newEntry( get(a) );
-         //append(resultList, NewEntry);
-	 resultEntry->data = getData( get(a) );
-         resultEntry->columnNumber = getColumn( get(a) );
+         Entry NewEntry = copyEntry( get(a) );
+         append(resultList, NewEntry);
+	 /* resultEntry->data = getData( get(a) ); */
+         /* resultEntry->columnNumber = getColumn( get(a) ); */
 
-	 append(resultList, resultEntry);
+	 /* append(resultList, resultEntry); */
          moveNext(a);
       }
       else
@@ -606,9 +606,9 @@ List addHelper(List a, List b, bool isSum)
          {
             resultEntry->data = -1 * getData( get(b) );
          }
-	 //         Entry NewEntry = newEntry(resultEntry);
-	 //         append(resultList, NewEntry);
- 	 append(resultList, resultEntry);
+         Entry NewEntry = copyEntry(resultEntry);
+         append(resultList, NewEntry);
+ 	 /* append(resultList, resultEntry); */
          moveNext(b);
       }
    }
@@ -616,12 +616,12 @@ List addHelper(List a, List b, bool isSum)
    {
       do
       {
-	 //         Entry NewEntry = newEntry(get(a));
-	 //         append( resultList, NewEntry );
-	 resultEntry->data = getData( get(a) );
-         resultEntry->columnNumber = getColumn( get(a) );
+         Entry NewEntry = copyEntry(get(a));
+         append( resultList, NewEntry );
+	 /* resultEntry->data = getData( get(a) ); */
+         /* resultEntry->columnNumber = getColumn( get(a) ); */
 
-	 append(resultList, resultEntry);
+	 /* append(resultList, resultEntry); */
          moveNext(a);
       }
       while( Index(a) != -1 );
@@ -632,12 +632,12 @@ List addHelper(List a, List b, bool isSum)
       {
          do
          {
-	    //            Entry NewEntry = newEntry( get(b) );
-	    //            append( resultList, NewEntry );
+            Entry NewEntry = copyEntry( get(b) );
+            append( resultList, NewEntry );
 
-            resultEntry->data = getData( get(b) );
-            resultEntry->columnNumber = getColumn( get(b) );
-	    append(resultList, resultEntry);
+            /* resultEntry->data = getData( get(b) ); */
+            /* resultEntry->columnNumber = getColumn( get(b) ); */
+	    /* append(resultList, resultEntry); */
             moveNext( b );
          }
          while( Index(b) != -1 );
@@ -649,9 +649,9 @@ List addHelper(List a, List b, bool isSum)
             resultEntry->data = -1 * getData( get(b) );
             resultEntry->columnNumber = getColumn( get(b) );
 
-	    //	    Entry NewEntry = newEntry( resultEntry );
-	    //            append(resultList, NewEntry);
-	    append(resultList, resultEntry);
+	    Entry NewEntry = copyEntry( resultEntry );
+            append(resultList, NewEntry);
+	    /* append(resultList, resultEntry); */
             moveNext(b);
          }
          while( Index(b) != -1 );
