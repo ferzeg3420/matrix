@@ -23,7 +23,6 @@ typedef struct EntryObj
 
 // newEntry()
 // creates a new entry object.
-// preconditions:
 Entry newEntry(int columnNumber, double data)
 {
    Entry E;
@@ -34,13 +33,12 @@ Entry newEntry(int columnNumber, double data)
 }
 
 // copyEntry()
-// copies a new entry object.
-// preconditions: 
-Entry copyEntry(Entry other) // changed int to object.
+// returns a new instance of Entry that is a deep copy of the argument Entry.
+Entry copyEntry(Entry other)
 {
    if( other == NULL )
    {
-      printf("Matrix error: calling entrie's copyEntry() on null entry as"
+      printf("Matrix error: calling entry's copyEntry() on null entry as"
              " argument.");
       exit(1);
    }
@@ -56,7 +54,7 @@ int getColumn(Entry E)
 {
    if( E == NULL )
    {
-      printf("Matrix error: calling entrie's getColumn() on null entry");
+      printf("Matrix error: calling entry's getColumn() on null entry");
       exit(1);
    }
    return E->columnNumber;
@@ -68,7 +66,7 @@ double getData(Entry E)
 {
    if( E == NULL )
    {
-      printf("Matrix error: calling entrie's getData() on null entry");
+      printf("Matrix error: calling entry's getData() on null entry");
       exit(1);
    }
    return E->data;
@@ -80,7 +78,7 @@ void setData(Entry E, double x)
 {
    if( E == NULL )
    {
-      printf("Matrix error: calling entrie's setData() on null entry");
+      printf("Matrix error: calling entry's setData() on null entry");
       exit(1);
    }
    E->data = x;
@@ -257,7 +255,7 @@ void makeZero(Matrix M)
    {
       clear(M->rows[i]);
    }
-} // DON'T FORGET TO TEST WHEN CHANGEENTRY IS COMPLETE ON NON-EMPTY MATRICES.
+}
 
 // changeEntry()
 // pre: 1<=i<=getSize(), 1<=j<=getSize()
@@ -279,12 +277,10 @@ void changeEntry(Matrix M, int i, int j, double x)
          {
             if( x == 0.0 )
             {
-               printf("Case 3 x= %f\n", x); // debug
                delete(M->rows[i]);
             }
             else
             {
-               printf("Case 4 x= %f\n", x); // debug
                setData( get( M->rows[i] ), x ); 
             }
             break;
@@ -293,16 +289,14 @@ void changeEntry(Matrix M, int i, int j, double x)
          {
             if( x != 0.0 )
             {
-               printf("Case 2 x= %f\n", x); // debug
                insertBefore(M->rows[i], E);
             }
             break;
          }
       }
    }
-   if( Index(M->rows[i]) == -1 && x != 0 ) // Case 1
+   if( Index(M->rows[i]) == -1 && x != 0 )
    {
-      printf("Case 1 x= %f\n", x); // debug
       append(M->rows[i], E);
    }
 }
@@ -406,7 +400,7 @@ Matrix transpose(Matrix M)
          column = getColumn(get(currentRow));
          currentData = getData(get(currentRow));
 
-         changeEntry(transposedMatrix, column, row, currentData); // index invert
+         changeEntry(transposedMatrix, column, row, currentData);// index invert
       }
    }
    return transposedMatrix;
@@ -535,7 +529,6 @@ List addHelper(List a, List b, bool isSum)
          }
          Entry NewEntry = copyEntry(resultEntry);
 	 append( resultList, NewEntry );
-	 // append(resultList, resultEntry);
       }
       return resultList;
    }
@@ -543,11 +536,8 @@ List addHelper(List a, List b, bool isSum)
    {
       for( moveFront(a); Index(a) != -1; moveNext(a) )
       {
-	 /* resultEntry->data = getData( get(a) ); */   // uncomment to test errors!!!!!!!!!
-         /* resultEntry->columnNumber = getColumn( get(a) ); */
 	 Entry NewEntry = copyEntry( get(a) );
 	 append( resultList, NewEntry );
- 	 /* append(resultList, resultEntry); */
       }
       return resultList;
    }
@@ -575,7 +565,6 @@ List addHelper(List a, List b, bool isSum)
          if (resultEntry->data != 0.0)
          {
 	    append(resultList, NewEntry);
-            /* append(resultList, resultEntry); */
          }
          moveNext(a);
          if ( !areSameList )
@@ -588,10 +577,6 @@ List addHelper(List a, List b, bool isSum)
       {
          Entry NewEntry = copyEntry( get(a) );
          append(resultList, NewEntry);
-	 /* resultEntry->data = getData( get(a) ); */
-         /* resultEntry->columnNumber = getColumn( get(a) ); */
-
-	 /* append(resultList, resultEntry); */
          moveNext(a);
       }
       else
@@ -608,7 +593,6 @@ List addHelper(List a, List b, bool isSum)
          }
          Entry NewEntry = copyEntry(resultEntry);
          append(resultList, NewEntry);
- 	 /* append(resultList, resultEntry); */
          moveNext(b);
       }
    }
@@ -618,10 +602,6 @@ List addHelper(List a, List b, bool isSum)
       {
          Entry NewEntry = copyEntry(get(a));
          append( resultList, NewEntry );
-	 /* resultEntry->data = getData( get(a) ); */
-         /* resultEntry->columnNumber = getColumn( get(a) ); */
-
-	 /* append(resultList, resultEntry); */
          moveNext(a);
       }
       while( Index(a) != -1 );
@@ -634,10 +614,6 @@ List addHelper(List a, List b, bool isSum)
          {
             Entry NewEntry = copyEntry( get(b) );
             append( resultList, NewEntry );
-
-            /* resultEntry->data = getData( get(b) ); */
-            /* resultEntry->columnNumber = getColumn( get(b) ); */
-	    /* append(resultList, resultEntry); */
             moveNext( b );
          }
          while( Index(b) != -1 );
@@ -651,7 +627,6 @@ List addHelper(List a, List b, bool isSum)
 
 	    Entry NewEntry = copyEntry( resultEntry );
             append(resultList, NewEntry);
-	    /* append(resultList, resultEntry); */
             moveNext(b);
          }
          while( Index(b) != -1 );
