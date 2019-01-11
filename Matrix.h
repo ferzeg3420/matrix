@@ -26,13 +26,13 @@ Entry newEntry(int columnNumber, double data); // changed int to object.
 Entry copyEntry(Entry other);
 
 // Access Functions -----------------------------------------------------------
-// getColumn()
+// getEntryColumn()
 // returns the column field in an entry struct.
-int getColumn(Entry E);
+int getEntryColumn(Entry E);
 
-// getData()
+// getEntryData()
 // returns the data field in an entry struct.
-double getData(Entry E);
+double getEntryData(Entry E);
 
 // Manipulation procedures -------------------------------------------------
 
@@ -80,6 +80,10 @@ int getNNZ(Matrix M);
 // Returns true if two matrices are equal. False otherwise. ?
 bool matrixEquals(Matrix L, Matrix R);
 
+// getMatrixEntryData()
+// returns the data in an Entry when given column and row as arguments.
+double getMatrixEntryData(Matrix M, int column, int row);
+
 // Manipulation procedures -------------------------------------------------
 
 // makeZero()
@@ -113,7 +117,7 @@ Matrix transpose();
 // mult()
 // returns a new Matrix that is the product of this Matrix with M
 // pre: getMatrixSize()==M.getMatrixSize()
-Matrix mult(Matrix M);
+Matrix mult(Matrix L, Matrix R);
 
 // Other Functions ---------------------------------------------------------
 

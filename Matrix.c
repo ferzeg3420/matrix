@@ -48,25 +48,25 @@ Entry copyEntry(Entry other)
    return E;
 }
 
-// getColumn()
+// getEntryColumn()
 // returns the column field in an entry struct.
-int getColumn(Entry E)
+int getEntryColumn(Entry E)
 {
    if( E == NULL )
    {
-      printf("Matrix error: calling entry's getColumn() on null entry");
+      printf("Matrix error: calling entry's getEntryColumn() on null entry");
       exit(1);
    }
    return E->columnNumber;
 }
 
-// getData()
+// getEntryData()
 // returns the data field in an entry struct.
-double getData(Entry E)
+double getEntryData(Entry E)
 {
    if( E == NULL )
    {
-      printf("Matrix error: calling entry's getData() on null entry");
+      printf("Matrix error: calling entry's getEntryData() on null entry");
       exit(1);
    }
    return E->data;
@@ -175,8 +175,8 @@ Matrix copyMatrix(Matrix M)
   
       for( moveFront(thisRow); Index(thisRow)!= -1; moveNext(thisRow) )
       {
-         thisColumn = getColumn(get(thisRow));
-         thisData = getData(get(thisRow));
+         thisColumn = getEntryColumn(get(thisRow));
+         thisData = getEntryData(get(thisRow));
          changeEntry(matrixCopy, i, thisColumn, thisData);
       }
    }
@@ -244,6 +244,26 @@ bool areMatricesEqual(Matrix L, Matrix R)
    return true;
 }
 
+double getMatrixEntryData(Matrix M, int column, int row)
+{
+   List * workingList = &( M->rows[row] );
+   Entry * workingEntry = NULL;
+
+   for
+   ( moveFront(*workingList);
+     Index(*workingList) != -1;
+     moveNext(*workingList)
+   ){
+      workingEntry = &( get(*workingList) );
+      if( getEntryColumn(*workingEntry) == column )
+      {
+	 return getEntryData(*workingEntry);
+      }
+   }
+   return 0.0; // clearly an error has ocurred. maybe should return a
+               // ridiculous value and test for it somewhere in the client.
+}
+
 // Manipulation procedures -------------------------------------------------
 
 // makeZero()
@@ -273,7 +293,7 @@ void changeEntry(Matrix M, int i, int j, double x)
    {
       for( moveFront(M->rows[i]); Index(M->rows[i]) != -1; moveNext(M->rows[i]) )
       {
-         if( getColumn(get(M->rows[i])) == j )
+         if( getEntryColumn(get(M->rows[i])) == j )
          {
             if( x == 0.0 )
             {
@@ -285,7 +305,7 @@ void changeEntry(Matrix M, int i, int j, double x)
             }
             break;
          }
-         if(  getColumn( get(M->rows[i]) )  > j ) 
+         if(  getEntryColumn( get(M->rows[i]) )  > j ) 
          {
             if( x != 0.0 )
             {
@@ -321,8 +341,8 @@ Matrix scalarMult(Matrix M, double x)
          {
             Entry resultEntry = newEntry
                (
-		getColumn( get(oldRow) ),
-                getData( get(oldRow) ) * x
+		getEntryColumn( get(oldRow) ),
+                getEntryData( get(oldRow) ) * x
                );
             append(resultRow, resultEntry);
          }
@@ -397,8 +417,8 @@ Matrix transpose(Matrix M)
            Index(currentRow) != -1;
            moveNext(currentRow)
       ){
-         column = getColumn(get(currentRow));
-         currentData = getData(get(currentRow));
+         column = getEntryColumn(get(currentRow));
+         currentData = getEntryData(get(currentRow));
 
          changeEntry(transposedMatrix, column, row, currentData);// index invert
       }
@@ -470,12 +490,12 @@ double dot(List P, List Q)
    moveFront(Q);
    while( Index(P) != -1 && Index(Q) != -1 )
    {
-      columnP = getColumn(get(P));
-      columnQ = getColumn(get(Q));
+      columnP = getEntryColumn(get(P));
+      columnQ = getEntryColumn(get(Q));
 
       if( columnP == columnQ )
       {
-         returnValue += getData( get(P) ) * getData( get(Q) );
+         returnValue += getEntryData( get(P) ) * getEntryData( get(Q) );
          moveNext(P);
          moveNext(Q);
       }
@@ -518,14 +538,14 @@ List addHelper(List a, List b, bool isSum)
    {
       for( moveFront(b); Index(b) != -1; moveNext(b) )
       {
-         resultEntry->columnNumber = getColumn(get(b));      
+         resultEntry->columnNumber = getEntryColumn(get(b));      
          if( isSum )
          {
-            resultEntry->data = getData(get(b));
+            resultEntry->data = getEntryData(get(b));
          }
          else
          {
-            resultEntry->data = -1 * getData(get(b));
+            resultEntry->data = -1 * getEntryData(get(b));
          }
          Entry NewEntry = copyEntry(resultEntry);
 	 append( resultList, NewEntry );
@@ -545,19 +565,19 @@ List addHelper(List a, List b, bool isSum)
    moveFront(b);
    while( Index(a) != -1 && Index(b) != -1 )
    {
-      columnNumberA = getColumn(get(a));
-      columnNumberB = getColumn(get(b));
+      columnNumberA = getEntryColumn(get(a));
+      columnNumberB = getEntryColumn(get(b));
 
       if( columnNumberA == columnNumberB )
       {
          resultEntry->columnNumber = columnNumberA;
          if( isSum )
          {
-            resultEntry->data =  getData( get(a) ) + getData( get(b) );
+            resultEntry->data =  getEntryData( get(a) ) + getEntryData( get(b) );
          }
          else
          {
-            resultEntry->data = getData( get(a) ) - getData( get(b) );
+            resultEntry->data = getEntryData( get(a) ) - getEntryData( get(b) );
          }
 
 	 Entry NewEntry = copyEntry(resultEntry);
@@ -581,15 +601,15 @@ List addHelper(List a, List b, bool isSum)
       }
       else
       {
-         resultEntry->columnNumber = getColumn(get(b));
+         resultEntry->columnNumber = getEntryColumn(get(b));
 
 	 if( isSum )
          {
-            resultEntry->data = getData(get(b));
+            resultEntry->data = getEntryData(get(b));
          } 
          else
          {
-            resultEntry->data = -1 * getData( get(b) );
+            resultEntry->data = -1 * getEntryData( get(b) );
          }
          Entry NewEntry = copyEntry(resultEntry);
          append(resultList, NewEntry);
@@ -622,8 +642,8 @@ List addHelper(List a, List b, bool isSum)
       {
          do
          {
-            resultEntry->data = -1 * getData( get(b) );
-            resultEntry->columnNumber = getColumn( get(b) );
+            resultEntry->data = -1 * getEntryData( get(b) );
+            resultEntry->columnNumber = getEntryColumn( get(b) );
 
 	    Entry NewEntry = copyEntry( resultEntry );
             append(resultList, NewEntry);
