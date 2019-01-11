@@ -2,17 +2,16 @@
 #define _MATRIX_H_INCLUDE_
 
 #include <stdbool.h>
+#include "List.h"
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-#include "List.h"
 
 // Entry type -----------------------------------------------------------------
 
 // Exported type --------------------------------------------------------------
 
 typedef struct EntryObj* Entry;
-typedef struct ListObj* List;
 
 // Contructors and destructors ------------------------------------------------
 
@@ -41,13 +40,9 @@ double getData(Entry E);
 // changes the value in the data field of the entry.
 void setData(Entry E, double x);
 
-// toString()
+// entryToString()
 // stringifies an entry
-void toString(Entry E, FILE* file);
-
-// areEntriesEqual()
-// test if entries are equivalent, their data members have the same values.
-bool areEntriesEqual(Entry L, Entry R);
+void entryToString(Entry E, FILE* file);
 
 // Matrix type ----------------------------------------------------------------
 
@@ -73,9 +68,9 @@ Matrix copyMatrix(Matrix M);
 
 // Access Functions -----------------------------------------------------------
 
-// getSize()
+// getMatrixSize()
 // Returns the size of the Matrix (the dimensions).
-int getSize(Matrix M);
+int getMatrixSize(Matrix M);
 
 // getNNZ()
 // Returns the number of non-zero entries.
@@ -83,7 +78,7 @@ int getNNZ(Matrix M);
 
 // matrixEquals()
 // Returns true if two matrices are equal. False otherwise. ?
-bool areMatricesEqual(Matrix L, Matrix R);
+bool matrixEquals(Matrix L, Matrix R);
 
 // Manipulation procedures -------------------------------------------------
 
@@ -94,7 +89,7 @@ void makeZero(Matrix M);
 
 // changeEntry()
 // changes ith row, jth column of this Matrix to x
-// pre: 1<=i<=getSize(), 1<=j<=getSize()
+// pre: 1<=i<=getMatrixSize(), 1<=j<=getMatrixSize()
 void changeEntry(Matrix M, int i, int j, double x);
 
 // scalarMult()
@@ -103,28 +98,28 @@ Matrix scalarMult(Matrix M, double x);
 
 // add()	 
 // returns a new Matrix that is the sum of this Matrix with M
-// pre: getSize()==M.getSize()
+// pre: getMatrixSize()==M.getMatrixSize()
 Matrix add(Matrix L, Matrix R);
 
 // sub()
 // returns a new Matrix that is the difference of this Matrix with M
-// pre: getSize()==M.getSize()
+// pre: getMatrixSize()==M.getMatrixSize()
 Matrix sub(Matrix L, Matrix R);
 
 // transpose()
 // returns a new Matrix that is the transpose of this Matrix 
-Matrix transpose(Matrix M);
+Matrix transpose();
     
 // mult()
 // returns a new Matrix that is the product of this Matrix with M
-// pre: getSize()==M.getSize()
-Matrix mult(Matrix L, Matrix R);
+// pre: getMatrixSize()==M.getMatrixSize()
+Matrix mult(Matrix M);
 
 // Other Functions ---------------------------------------------------------
 
 // matrixToString()
 // returns a text representation of the matrix.
-void matrixToString(Matrix M, FILE * out);
+void matrixToString(FILE * out, Matrix M);
 
 // dot()
 // Takes the dot product of two lists.

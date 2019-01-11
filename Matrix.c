@@ -185,9 +185,9 @@ Matrix copyMatrix(Matrix M)
 
 // Access Functions ---------------------------------------------------------------
 
-// getSize()
+// getMatrixSize()
 // Returns the size of the Matrix (the dimensions).
-int getSize(Matrix M)
+int getMatrixSize(Matrix M)
 { 
    return M->dimensions; 
 }
@@ -215,7 +215,7 @@ bool areMatricesEqual(Matrix L, Matrix R)
    {
       return true;
    }
-   if( getSize(L) != getSize(R) )
+   if( getMatrixSize(L) != getMatrixSize(R) )
    {
       return false;
    }
@@ -258,11 +258,11 @@ void makeZero(Matrix M)
 }
 
 // changeEntry()
-// pre: 1<=i<=getSize(), 1<=j<=getSize()
+// pre: 1<=i<=getMatrixSize(), 1<=j<=getMatrixSize()
 // changes ith row, jth column of this Matrix to x
 void changeEntry(Matrix M, int i, int j, double x)
 {
-   if( i < 1 || i > getSize(M) || j < 1 || j > getSize(M) )
+   if( i < 1 || i > getMatrixSize(M) || j < 1 || j > getMatrixSize(M) )
    {
       printf( "Error: Program: Sparse, module: Matrix, precondition:"
               " changeEntry() called with out of bounds arguments.");
@@ -333,10 +333,10 @@ Matrix scalarMult(Matrix M, double x)
 
 // add()
 // returns a new Matrix that is the sum of this Matrix with M
-// pre: getSize()==M.getSize()
+// pre: getMatrixSize()==M.getMatrixSize()
 Matrix add(Matrix L, Matrix R)
 {
-   if( getSize(L) != getSize(R) )
+   if( getMatrixSize(L) != getMatrixSize(R) )
    {
       printf("Error: Program: Sparse, module: Matrix, precondition:"
              " add() called with mismatching dimensions.");
@@ -357,10 +357,10 @@ Matrix add(Matrix L, Matrix R)
 
 // sub()
 // returns a new Matrix that is the difference of this Matrix with M
-// pre: getSize()==M.getSize()
+// pre: getMatrixSize()==M.getMatrixSize()
 Matrix sub(Matrix L, Matrix R)
 {
-   if( getSize(L) != getSize(R) )
+   if( getMatrixSize(L) != getMatrixSize(R) )
    {
       printf("Error: Program: Sparse, module: Matrix, precondition:"
              " sub() called with mismatching dimensions.");
@@ -370,7 +370,7 @@ Matrix sub(Matrix L, Matrix R)
    List leftRow = newList();
    List rightRow = newList();
 
-   for( int i = 1; i <= getSize(L); i++)
+   for( int i = 1; i <= getMatrixSize(L); i++)
    {
       leftRow = L->rows[i];
       rightRow = R->rows[i];
@@ -408,10 +408,10 @@ Matrix transpose(Matrix M)
 
 // mult()
 // Returns a new Matrix that is the product of this Matrix with M
-// pre: getSize()==M.getSize()
+// pre: getMatrixSize()==M.getMatrixSize()
 Matrix mult(Matrix L, Matrix R)
 {
-   if( getSize(L) != getSize(R) )
+   if( getMatrixSize(L) != getMatrixSize(R) )
    {
       printf("Error: Program: Sparse, module: Matrix, precondition: mult()"
              " called with mismatching dimensions.");
@@ -445,7 +445,7 @@ Matrix mult(Matrix L, Matrix R)
 
 // matrixToString()
 // returns a text representation of the matrix.
-void matrixToString(Matrix M, FILE * out)
+void matrixToString(FILE * out, Matrix M)
 {
    for(int i = 1; i <= M->dimensions; i++)
    {
